@@ -24,6 +24,8 @@ namespace danikk_engine
 
 		Texture(const char* name, int filter = texture_filters::nearest);
 
+		void free();
+
 		Texture& operator=(Texture& other);
 
 		Texture& operator=(Texture&& other);

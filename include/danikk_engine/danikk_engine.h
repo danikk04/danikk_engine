@@ -31,11 +31,4 @@ namespace danikk_engine
 	class Sprite;
 	class TextStyle;
 	class Model;
-
-	struct vertex
-	{
-		vec3 pos;
-		vec3 normal;
-		vec2 uv;
-	};
 }

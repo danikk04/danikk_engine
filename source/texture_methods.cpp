@@ -4,15 +4,20 @@
 #include <danikk_engine/danikk_engine.h>
 #include <danikk_engine/texture_methods.h>
 #include <danikk_engine/internal/gl_object_manager.h>
-#include <danikk_engine/internal/vertex_attrib.h>
 #include <danikk_engine/shader.h>
 #include <danikk_engine/mesh.h>
 #include <danikk_engine/dynamic_mesh.h>
 
+#include <danikk_framework/memory.h>
+
 namespace danikk_engine
 {
+	using namespace danikk_engine::internal;
+
 	Texture white_texture;
 	Sprite white_sprite;
+
+	AssetContainer white_texture_container(asset_type::texture, "white_texture");
 
 	static constexpr uint vertices_size = sizeof(float) * 4 * 8;
 	static constexpr uint indices_size = 6 * sizeof(gl_point_index_t);
@@ -35,6 +40,24 @@ namespace danikk_engine
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,  GL_REPEAT);
 		//glGenerateMipmap(GL_TEXTURE_2D);
     }
+
+	void initTextureRenderer()
+	{
+
+    	static const char* data =
+			"\255\255\255\255";
+
+		white_texture = Texture(&white_texture_container);
+		white_texture.handle() = glGenTexture();
+		glBindTexture(GL_TEXTURE_2D, white_texture.handle());
+		setupDefaultTextureParameters(texture_filters::nearest);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, (const void*)data);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+
+
+		white_sprite = white_texture.createSprite();
+	}
 
     void setWorldMatrix(const mat4& world)
     {

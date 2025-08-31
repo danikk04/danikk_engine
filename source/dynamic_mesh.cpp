@@ -25,133 +25,22 @@ namespace danikk_engine
 		0, 1, 2
 	};
 
-
-
-	DynamicMesh::DynamicMesh(const InitList<Vertex>& vertexes, const InitList<gl_point_index_t>& indexes)
-	{
-		new (&this->vertexes) DynamicArray<Vertex>(vertexes);
-		new (&this->indexes) DynamicArray<gl_point_index_t>(indexes);
-	}
-
-	Mesh DynamicMesh::toMesh()
-	{
-		return Mesh(vertexes, indexes);
-	}
-
-	DynamicMesh& DynamicMesh::operator=(const DynamicMesh& other)
-	{
-		indexes = other.indexes;
-		vertexes = other.vertexes;
-		return *this;
-	}
-
-	void DynamicMesh::addSquare(const vec3& pos, const vec3& normal, const vec2& uv_offset, const vec2 uv_size)
-	{
-		Vertex poses[4]
-		{
-			Vertex(vec3(0.5f, 	0.0f, 0.5f), 	normal, 	uv_offset),
-			Vertex(vec3(-0.5f, 0.0f, 0.5f), 	normal,		vec2(uv_offset.x + uv_size.x, uv_offset.y)),
-			Vertex(vec3(-0.5f, 0.0f, -0.5f), 	normal,		uv_offset + uv_size),
-			Vertex(vec3(0.5f, 	0.0f, -0.5f), 	normal,		vec2(uv_offset.x, uv_offset.y + uv_size.y)),
-		};
-		for(Vertex& square_pos : poses)
-		{
-			if(normal.y == 1)
-			{
-				square_pos.pos = glm::rotateX(square_pos.pos, (float)pi * 0.5f);
-			}
-			if(normal.y == -1)
-			{
-
-			}
-			else
-			{
-				square_pos.pos = glm::rotateX(square_pos.pos, 0.5f * pi);
-				float rotation = atan2(normal.x, normal.z);
-				square_pos.pos = glm::rotateY(square_pos.pos, rotation);
-			}
-			square_pos.pos += pos;
-		}
-		addSquare((Vertex*)poses);
-	}
-
-	void DynamicMesh::addSquare(vec3* poses, const vec3& normal)
-	{
-		gl_point_index_t first_index = vertexes.size();
-		for(index_t i = 0; i < 4; i++)
-		{
-			Vertex vertex;
-			vertex.pos = poses[i];
-			vertex.normal = normal;
-			vertex.uv = square_tex_coords[i];
-			vertexes.push(vertex);
-		}
-
-		for(gl_point_index_t i : square_end_indices)
-		{
-			indexes.push(first_index + i);
-		}
-	}
-
-	void DynamicMesh::addSquare(Vertex* vertexes)
-	{
-		gl_point_index_t first_index = this->vertexes.size();
-		for(index_t i = 0; i < 4; i++)
-		{
-			this->vertexes.push(vertexes[i]);
-		}
-
-		for(gl_point_index_t i : square_end_indices)
-		{
-			indexes.push(first_index + i);
-		}
-	}
-
 	void initBuiltInMeshes()
 	{
-		DynamicMesh dynamic_sprite_mesh = DynamicMesh
+		DynamicMesh<DefaultVertex> dynamic_sprite_mesh = DynamicMesh<DefaultVertex>
 		(
 			{
-				Vertex(0.5f,  0.5f, 0.0f,	0.0f,  0.0f, 1.0f,	1.0f, 0.0f),
-				Vertex(0.5f, -0.5f, 0.0f,	0.0f,  0.0f, 1.0f,	1.0f, 1.0f),
-				Vertex(-0.5f, -0.5f, 0.0f,	0.0f,  0.0f, 1.0f,	0.0f, 1.0f),
-				Vertex(-0.5f,  0.5f, 0.0f,	0.0f,  0.0f, 1.0f,	0.0f, 0.0f),
+				DefaultVertex(0.5f,  0.5f, 0.0f,	0.0f,  0.0f, 1.0f,	1.0f, 0.0f),
+				DefaultVertex(0.5f, -0.5f, 0.0f,	0.0f,  0.0f, 1.0f,	1.0f, 1.0f),
+				DefaultVertex(-0.5f, -0.5f, 0.0f,	0.0f,  0.0f, 1.0f,	0.0f, 1.0f),
+				DefaultVertex(-0.5f,  0.5f, 0.0f,	0.0f,  0.0f, 1.0f,	0.0f, 0.0f),
 			},
 			{
-				2, 3, 0,
-				0, 1, 2,
+				0, 3, 2,
+				2, 1, 0,
 			}
 		);
-
-		/*DynamicMesh dynamic_cube = DynamicMesh
-		(
-			{
-				Vertex(1.0f, 1.0f, 1.0f,	0.0f, 0.0f, 0.0f, 	1.0f, 1.0f),
-				Vertex(-1.0f, 1.0f, 1.0f, 	0.0f, 0.0f, 0.0f, 	0.0f, 1.0f),
-				Vertex(-1.0f, 1.0f, -1.0f, 	0.0f, 0.0f, 0.0f, 	0.0f, 0.0f),
-				Vertex(1.0f, 1.0f, -1.0f, 	0.0f, 0.0f, 0.0f, 	1.0f, 0.0f),
-
-				Vertex(1.0f, -1.0f, 1.0f, 	0.0f, 0.0f, 0.0f, 	0.0f, 0.0f),
-				Vertex(-1.0f, -1.0f, 1.0f, 	0.0f, 0.0f, 0.0f, 	0.0f, 0.0f),
-				Vertex(-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 	0.0f, 0.0f),
-				Vertex(1.0f, -1.0f, -1.0f, 	0.0f, 0.0f, 0.0f, 	0.0f, 0.0f),
-			},
-			{
-				0, 1, 3, //верх 1
-				3, 1, 2, //верх 2
-				2, 6, 7, //перед 1
-				7, 3, 2, //перед 2
-				7, 6, 5, //низ 1
-				5, 4, 7, //низ 2
-				5, 1, 4, //зад 1
-				4, 1, 0, //зад 2
-				4, 3, 7, //право 1
-				3, 4, 0, //право 2
-				5, 6, 2, //лево 1
-				5, 1, 2  //лево 2
-			}
-		);*/
-		DynamicMesh dynamic_cube;
+		DynamicMesh<DefaultVertex> dynamic_cube;
 		float start = -0.50f;
 		float end = 1.0f;
 		float step = 1.0f;
@@ -168,7 +57,9 @@ namespace danikk_engine
 			dynamic_cube.addSquare(vec3(0, 0, z), vec3(0, 0, z * 2));
 		}
 
-		cube_mesh = dynamic_cube.toMesh();
-		sprite_mesh = dynamic_sprite_mesh.toMesh();
+		dynamic_cube.setDataToMesh(cube_mesh);
+		DefaultVertex::setAttributes();
+		dynamic_sprite_mesh.setDataToMesh(sprite_mesh);
+		DefaultVertex::setAttributes();
 	}
 }

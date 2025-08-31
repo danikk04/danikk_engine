@@ -10,7 +10,6 @@
 #include <danikk_engine/internal/stb.h>
 #include <danikk_engine/internal/data_manager.h>
 #include <danikk_engine/internal/gl_object_manager.h>
-#include <danikk_engine/internal/vertex_attrib.h>
 #include <danikk_engine/internal/glexec.h>
 #include <danikk_engine/matrix/uv.h>
 
@@ -48,6 +47,11 @@ namespace danikk_engine
 		)
 		return texture_handle;
     }
+
+	void Texture::free()
+	{
+    	this->~Asset();
+	}
 
     Texture::Texture(const char* name, int filter)
     {
@@ -96,7 +100,7 @@ namespace danikk_engine
             		danikk_framework::formatLogWarning("Mismatch color channels for texture \"%\"", name);
             	}
 
-                free(data);
+                ::free(data);
             }
             else
 			{
@@ -118,7 +122,6 @@ namespace danikk_engine
 
     Texture& Texture::operator=(Texture& other)
     {
-    	this->~Asset();
     	new (this) Texture(other);
     	return *this;
     }

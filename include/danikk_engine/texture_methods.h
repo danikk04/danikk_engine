@@ -13,10 +13,7 @@ namespace danikk_engine
 
 	typedef mat2 uv_matrix;
 
-	namespace internal
-	{
-		void initTextureRenderer();
-	}
+	void initTextureRenderer();
 
     void setupDefaultTextureParameters(int filter = texture_filters::nearest);
 

@@ -1,13 +1,14 @@
 #include <danikk_engine/danikk_engine.h>
 #include <danikk_engine/mesh.h>
 #include <danikk_engine/internal/data_manager.h>
-#include <danikk_engine/internal/vertex_attrib.h>
 #include <danikk_engine/internal/glexec.h>
 #include <danikk_engine/internal/gl_object_manager.h>
 
 #include <danikk_framework/misc/line_getter.h>
 #include <danikk_framework/cstring_functions.h>
 #include <danikk_framework/glm.h>
+
+#include <glad/glad.h>
 
 namespace danikk_engine
 {
@@ -37,10 +38,8 @@ namespace danikk_engine
 		DynamicArray<vec3> vertex_pos;
 		DynamicArray<vec2> vertex_uv;
 		DynamicArray<vec3> vertex_normal;
-		DynamicArray<Vertex> vertexes;
+		DynamicArray<DefaultVertex> vertexes;
 		DynamicArray<gl_point_index_t> indexes;
-
-		uint32 index_counter = 0;
 
 		if(can_load)
 		{
@@ -60,39 +59,46 @@ namespace danikk_engine
 				char* obj_key = splitted[0];
 				if(strequal(obj_key, "v"))
 				{
+					strreplacefirst8(splitted[1], '.', ',');
+					strreplacefirst8(splitted[2], '.', ',');
+					strreplacefirst8(splitted[3], '.', ',');
 					vertex_pos.push(parseVec3(splitted.data() + 1));
-
 				}
 				else if(strequal(obj_key, "vt"))
 				{
+					strreplacefirst8(splitted[1], '.', ',');
+					strreplacefirst8(splitted[2], '.', ',');
 					vertex_uv.push(parseVec2(splitted.data() + 1));
-
 				}
 				else if(strequal(obj_key, "vn"))
 				{
+					strreplacefirst8(splitted[1], '.', ',');
+					strreplacefirst8(splitted[2], '.', ',');
+					strreplacefirst8(splitted[3], '.', ',');
 					vertex_normal.push(parseVec3(splitted.data() + 1));
-
 				}
-				else if(strequal(obj_key, "vf"))
+				else if(strequal(obj_key, "f"))
 				{
 					char** current_data = splitted.data() + 1;
+					index_t base_index = vertexes.size();
 					for(index_t i = 0; i < 3; i++)
 					{
 						uvec3 index_vec = parseUvec3(current_data + i * 3);
 						vertexes.pushCtor(
-								vertex_pos[index_vec[0]],
-								vertex_normal[index_vec[1]],
-								vertex_normal[index_vec[2]]);
-						indexes.push(index_counter++);
+								vertex_pos[index_vec[0] - 1],
+								vertex_normal[index_vec[1] - 1],
+								vertex_uv[index_vec[2] - 1]);
+						indexes.push(base_index + i);
 
 					}
 				}
 			}
-			glexec
-			(
-				generateBuffers();
-				setData((float*)vertexes.data(),  vertexes.size() * 8, indexes.data(), indexes.size());
-			);
+			for(DefaultVertex& v : vertexes)
+			{
+				logInfo(v.pos);
+			}
+			setData((float*)vertexes.data(), vertexes.size() * sizeof(DefaultVertex) / sizeof(float), indexes.data(), indexes.size());
+			DefaultVertex::setAttributes();
 		}
 	}
 
@@ -103,48 +109,31 @@ namespace danikk_engine
 		element_buffer_object = glGenBuffer();
 	}
 
-	void Mesh::setData(const float* vertexes, size_t vertexes_count, const gl_point_index_t* indexes,  size_t indexes_count)
+	void Mesh::setData(const float* vertexes, size_t vertexes_array_size, const gl_point_index_t* indexes,  size_t indexes_count)
 	{
+		if(vertex_buffer_object == 0)
+		{
+			generateBuffers();
+		}
+		this->indexes_count = indexes_count;
 		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
-		glBufferData(GL_ARRAY_BUFFER, vertexes_count * sizeof(float), vertexes, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertexes_array_size * sizeof(float), vertexes, GL_STATIC_DRAW);
 
 		glBindVertexArray(vertex_array_object);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_count * sizeof(uint), indexes, GL_STATIC_DRAW);
-
-		setVertexAttributes();
 	}
 
-	Mesh::Mesh(const float* vertexes, size_t vertexes_count, const gl_point_index_t* indexes,  size_t indexes_count)
+	void Mesh::free()
 	{
-		this->indexes_count = indexes_count;
-
-        glexec
-		(
-			generateBuffers();
-			setData(vertexes, vertexes_count, indexes, indexes_count);
-        )
-	}
-
-	Mesh::Mesh(const DynamicArray<float>& vertexes, const DynamicArray<gl_point_index_t>& indexes) :
-		Mesh(vertexes.data() ,vertexes.size(),
-			 indexes.data(), indexes.size()){}
-
-	Mesh::Mesh(const DynamicArray<Vertex>& vertexes, const DynamicArray<gl_point_index_t>& indexes) :
-		Mesh((float*)vertexes.data() , vertexes.size() * 8,
-			  indexes.data(), indexes.size()){}
-
-	void Mesh::clear()
-	{
-		if(element_buffer_object != 0)
+		if(isNull())
 		{
-			glDeleteBuffer(element_buffer_object);
+			return;
 		}
-		if(vertex_buffer_object != 0)
-		{
-			glDeleteBuffer(vertex_buffer_object);
-		}
+		glDeleteBuffer(element_buffer_object);
+		glDeleteBuffer(vertex_buffer_object);
+		glDeleteVertexArray(vertex_array_object);
 	}
 
 	bool Mesh::isNull()
@@ -168,5 +157,11 @@ namespace danikk_engine
 		glBindVertexArray(vertex_array_object);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
 		glDrawElements(GL_TRIANGLES, indexes_count, GL_UNSIGNED_SHORT, (void*)(0));
+	}
+
+	void vertexAttribFloatPointer(uint index, int size, int offset, int vertex_size)
+	{
+		glEnableVertexAttribArray(index);
+		glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, vertex_size, (void*)offset);
 	}
 }

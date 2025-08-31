@@ -80,8 +80,6 @@ namespace danikk_engine
 	float screen_ratio_gz;
 	float screen_ratio_lz;
 
-	AssetContainer white_texture_container(asset_type::texture, "white_texture");
-
 	struct button_state
 	{
 		uint32 change_frame;
@@ -271,6 +269,8 @@ namespace danikk_engine
 		//glEnable(GL_TEXTURE0);
 		glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE_MODE);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -278,11 +278,7 @@ namespace danikk_engine
 
 		initGlObjectManager();
 		initBuiltInMeshes();
-
-		white_texture = Texture(&white_texture_container);
-		white_texture.handle() = 0;
-		white_sprite = white_texture.createSprite();
-		//white_sprite = danikk_engine::white_texture.createSprite();
+		initTextureRenderer();
 
 		gui_root.absolute_size = vec2(1.0f);
     }
@@ -368,7 +364,9 @@ namespace danikk_engine
 
     	danikk_framework::setLocale("ru_RU");
 	    danikk_framework::initLocalization();
+	    danikk_framework::default_random.init();
     	danikk_engine::initLocaliztion();
+
 
     	cwdToExd();
         formatLogInfo("CWD : %", getExecutableDirectory().c_string());
