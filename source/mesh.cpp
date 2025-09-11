@@ -34,7 +34,7 @@ namespace danikk_engine
 		{
 			can_load = loadDataToBuffer("models", model_name, name, "obj", true);
 		}
-
+		generateBuffers();
 		DynamicArray<vec3> vertex_pos;
 		DynamicArray<vec2> vertex_uv;
 		DynamicArray<vec3> vertex_normal;
@@ -92,10 +92,6 @@ namespace danikk_engine
 
 					}
 				}
-			}
-			for(DefaultVertex& v : vertexes)
-			{
-				logInfo(v.pos);
 			}
 			setData((float*)vertexes.data(), vertexes.size() * sizeof(DefaultVertex) / sizeof(float), indexes.data(), indexes.size());
 			DefaultVertex::setAttributes();
@@ -162,6 +158,6 @@ namespace danikk_engine
 	void vertexAttribFloatPointer(uint index, int size, int offset, int vertex_size)
 	{
 		glEnableVertexAttribArray(index);
-		glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, vertex_size, (void*)offset);
+		glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, vertex_size, (void*)(size_t)offset);
 	}
 }

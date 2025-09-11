@@ -10,15 +10,21 @@ namespace danikk_engine
 
 	typedef danikk_framework::Array<int16,4> KeyBindKeys;
 	typedef void (*key_bind_event_t)();
+	typedef void (*key_bind_args_event_t)(void*);
 
 	class KeyBindArray
 	{
 		struct KeyBind
 		{
 			KeyBindKeys keys;
-			key_bind_event_t event;
+			void* event;
+			void* arg_ptr;
 
 			KeyBind(const KeyBindKeys& keys, key_bind_event_t event);
+
+			KeyBind(const KeyBindKeys& keys, key_bind_args_event_t event, void* arg_ptr);
+
+			void execute();
 		};
 		DynamicArray<KeyBind> data;
 
@@ -28,6 +34,8 @@ namespace danikk_engine
 		KeyBind* getKeyBind(const KeyBindKeys& keys);
 
 		void bind(const KeyBindKeys& keys, key_bind_event_t event);
+
+		void bind(const KeyBindKeys& keys, key_bind_args_event_t event, void* arg_ptr);
 
 		void unbind(const KeyBindKeys& keys);
 

@@ -6,9 +6,28 @@ namespace danikk_engine
 	KeyBindArray::KeyBind::KeyBind(const KeyBindKeys& keys, key_bind_event_t event)
 	{
 		this->keys = keys;
-		this->event = event;
+		this->event = (void*)event;
+		this->arg_ptr = NULL;
 	}
 
+	KeyBindArray::KeyBind::KeyBind(const KeyBindKeys& keys, key_bind_args_event_t event, void* arg_ptr)
+	{
+		this->keys = keys;
+		this->event = (void*)event;
+		this->arg_ptr = arg_ptr;
+	}
+
+	void KeyBindArray::KeyBind::execute()
+	{
+		if(arg_ptr == NULL)
+		{
+			((key_bind_event_t)this->event)();
+		}
+		else
+		{
+			((key_bind_args_event_t)this->event)(arg_ptr);
+		}
+	}
 
 	KeyBindArray::KeyBind* KeyBindArray::getKeyBind(const KeyBindKeys& keys)
 	{
@@ -19,6 +38,11 @@ namespace danikk_engine
 	void KeyBindArray::bind(const KeyBindKeys& keys, key_bind_event_t event)
 	{
 		data.pushCtor(keys, event);
+	}
+
+	void KeyBindArray::bind(const KeyBindKeys& keys, key_bind_args_event_t event, void* arg_ptr)
+	{
+		data.pushCtor(keys, event, arg_ptr);
 	}
 
 	void KeyBindArray::unbind(const KeyBindKeys& keys)
@@ -49,7 +73,7 @@ namespace danikk_engine
 			{
 				goto end_of_bind;
 			}
-			bind.event();
+			bind.execute();
 			end_of_bind:;
 		}
 	}
