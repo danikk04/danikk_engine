@@ -16,7 +16,7 @@ namespace danikk_engine
     static constexpr uint GL_LOG_SIZE = 256;
     static uint last_shader = 0;
 
-    static String shader_layout = "#version 430 core\n";
+    static String shader_layout = "#version 460 core\n";
 
     struct VirtualIncludeFile
     {
@@ -218,6 +218,8 @@ namespace danikk_engine
     {
     	AssetContainer** container_ptr = assets.get(name);
     	AssetContainer* container;
+
+    	formatLogInfo("Loading shader: %", name);
 
     	if(container_ptr == NULL)
     	{

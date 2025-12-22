@@ -31,9 +31,8 @@ namespace danikk_engine
 			flags[GUIElementFlags::absolute_recalc] = false;
 			absolute_size = parent->absolute_size * relative_size + getPixelSize() * pixel_size;
 			absolute_pos = parent->absolute_pos + applyAnchor(pos, absolute_size, parent->absolute_size, anchor);
-			danikk_framework::formatLogDebug("%gui recalc pos:% % size:% %",
-					danikk_framework::n_chars(' ', rec_watcher.get() - 1),
-					absolute_pos.x, absolute_pos.y, absolute_size.x, absolute_size.y);
+			danikk_framework::formatLogDebug("% gui recalc pos:% % size:% %",
+					danikk_framework::n_chars(' ', rec_watcher.get() - 1), absolute_pos.x, absolute_pos.y, absolute_size.x, absolute_size.y);
 		}
 		draw(absolute_pos, absolute_size);
 		for(GUIElement* ch : childs)
