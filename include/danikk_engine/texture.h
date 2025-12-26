@@ -26,6 +26,8 @@ namespace danikk_engine
 
 		void free();
 
+		bool isNull();
+
 		Texture& operator=(Texture& other);
 
 		Texture& operator=(Texture&& other);

@@ -53,6 +53,11 @@ namespace danikk_engine
     	this->~Asset();
 	}
 
+	bool Texture::isNull()
+	{
+		return container == NULL;
+	}
+
     Texture::Texture(const char* name, int filter)
     {
     	AssetContainer** container_ptr = assets.get(name);
