@@ -2,7 +2,7 @@
 
 
 #include <danikk_framework/danikk_framework.h>
-#include <danikk_framework/string_buffer.h>
+#include <danikk_framework/static_string.h>
 #include <danikk_framework/dynamic_array.h>
 #include <danikk_framework/array.h>
 #include <danikk_framework/string.h>

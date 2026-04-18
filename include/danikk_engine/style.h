@@ -10,6 +10,7 @@ namespace danikk_engine
 	{
 		Shader shader;
 		vec4 color = vec4(1);
+
 	};
 
 	struct BorderDrawStyle : DrawStyle
@@ -32,7 +33,12 @@ namespace danikk_engine
 		TextStyle() = default;
 
 		void draw(const String& text, vec2 pos, vec2 size);
+
 	};
+
+	extern BorderDrawStyle default_border_draw_style;
+	extern DrawStyle default_draw_style;
+	extern TextStyle default_text_style;
 
 	void setDefaultGUIShader(Shader& shader);
 
@@ -41,14 +47,4 @@ namespace danikk_engine
 	void setDefaultCharSize(float height, float width);
 
 	void setDefaultCharInterval(float value);
-
-	namespace default_draw_styles
-	{
-		extern TextStyle label_text;
-		extern TextStyle button_text;
-		extern DrawStyle panel_draw;
-		extern DrawStyle button_draw;
-		extern BorderDrawStyle panel_border;
-		extern BorderDrawStyle window_border;
-	}
 }

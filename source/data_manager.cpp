@@ -7,7 +7,7 @@
 #include <danikk_framework/filestream.h>
 #include <danikk_framework/filesystem.h>
 #include <danikk_framework/path_buffer.h>
-#include <danikk_framework/string_buffer.h>
+#include <danikk_framework/static_string.h>
 #include <danikk_framework/cstring_functions.h>
 #include <danikk_framework/zip.h>
 #include <danikk_framework/memory.h>

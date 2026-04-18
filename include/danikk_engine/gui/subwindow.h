@@ -4,14 +4,14 @@
 
 namespace danikk_engine
 {
-	class SubWindow : public Panel
+	class SubWindow : public GUIElement
 	{
 	public:
-		Panel header;
-		Label title;
-		Button close_button;
+		GUIElement header;
+		GUIElement title;
+		GUIElement close_button;
 
-		Panel body;
+		GUIElement body;
 
 		SubWindow();
 
