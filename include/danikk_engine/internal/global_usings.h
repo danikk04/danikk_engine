@@ -33,7 +33,7 @@ namespace danikk_engine
 	GLOBAL_DF_USE(DynamicArray)
 	GLOBAL_DF_USE(MemoryBuffer)
 	GLOBAL_DF_USE(String)
-	GLOBAL_DF_USE(StringBuffer)
+	GLOBAL_DF_USE(StaticString)
 	GLOBAL_DF_USE(Array)
 
 	GLOBAL_DF_USE(InitList)

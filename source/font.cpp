@@ -116,7 +116,7 @@ namespace danikk_engine
 					page_kv = font_settings.get<String>(page_kv);
 					if(page_kv.contains('%'))
 					{
-						page_kv.replace("%", "");
+						page_kv.cutChars('%');
 						float margin_k = parseNumber<float>(page_kv) * 0.01f;
 						page.margin = (ivec2)((vec2)page.char_size * margin_k);
 					}
