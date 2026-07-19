@@ -57,24 +57,25 @@ namespace danikk_engine
 				strsplit(line, splitted, splitters);
 				//SplitToFirstSelectedChar(OBJReader.ReadLine(), ' ', out string DataType, out string Value);
 				char* obj_key = splitted[0];
+				//Забыл зачем strreplacefirst8, проверить. Код перенесён из старого движка на C#
 				if(strequal(obj_key, "v"))
 				{
-					strreplacefirst8(splitted[1], '.', ',');
-					strreplacefirst8(splitted[2], '.', ',');
-					strreplacefirst8(splitted[3], '.', ',');
+					//strreplacefirst8(splitted[1], '.', ',');
+					//strreplacefirst8(splitted[2], '.', ',');
+					//strreplacefirst8(splitted[3], '.', ',');
 					vertex_pos.push(parseVec3(splitted.data() + 1));
 				}
 				else if(strequal(obj_key, "vt"))
 				{
-					strreplacefirst8(splitted[1], '.', ',');
-					strreplacefirst8(splitted[2], '.', ',');
+					//strreplacefirst8(splitted[1], '.', ',');
+					//strreplacefirst8(splitted[2], '.', ',');
 					vertex_uv.push(parseVec2(splitted.data() + 1));
 				}
 				else if(strequal(obj_key, "vn"))
 				{
-					strreplacefirst8(splitted[1], '.', ',');
-					strreplacefirst8(splitted[2], '.', ',');
-					strreplacefirst8(splitted[3], '.', ',');
+					//strreplacefirst8(splitted[1], '.', ',');
+					//strreplacefirst8(splitted[2], '.', ',');
+					//strreplacefirst8(splitted[3], '.', ',');
 					vertex_normal.push(parseVec3(splitted.data() + 1));
 				}
 				else if(strequal(obj_key, "f"))

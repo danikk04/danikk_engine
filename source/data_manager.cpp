@@ -1,7 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION 1
 #define STBI_ONLY_PNG 1
 #include <glad/glad.h>
-#include <zip.h>
 
 #include <danikk_framework/memory_buffer.h>
 #include <danikk_framework/filestream.h>
