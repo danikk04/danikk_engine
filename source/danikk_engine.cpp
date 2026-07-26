@@ -218,12 +218,13 @@ namespace danikk_engine
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, gl_version_minor);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-        glfwWindowHint(GLFW_DECORATED, false);
+        glfwWindowHint(GLFW_DECORATED, true);
 
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
         window_size = ivec2(mode->width / 2 - 1, mode->height / 2);
+
         window = glfwCreateWindow(window_size.x, window_size.y, "danikk engine game", NULL, NULL);
 
         if (!window)
@@ -283,7 +284,7 @@ namespace danikk_engine
 		gui_root.absolute_size = vec2(1.0f);
 
 		glfwSetWindowSize(window, window_size.x+1, window_size.y);
-        //glViewport(0, 0, window_size.x, window_size.y);
+        glViewport(0, 0, window_size.x, window_size.y);
     }
 
     void exit()

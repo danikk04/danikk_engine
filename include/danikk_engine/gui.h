@@ -37,7 +37,7 @@ namespace danikk_engine
 		vec2 relative_size = vec2(0);
 		vec2 pixel_size = vec2(0);
 		vec2 absolute_size;
-		const char* name = NULL;
+		const char* name = "NONE";
 
 		String text;
 		TextStyle* text_style = &default_text_style;

@@ -89,30 +89,36 @@ namespace danikk_engine
             	FontData::rasterized_data_t& data = container->font_ptr->rasterized_data;
                 DynamicArray<FontData::rasterized_page>& pages = data.pages;
                 loadDataToBuffer("fonts", name, "rfmd", true);//rfmd - rasterized font meta data
-    			Config font_settings;
-    			font_settings.openData(asset_load_buffer.data(), asset_load_buffer.size());
+                danikk_framework::DynamicInlineStringDictionary<uint16> font_settings;
+                asset_load_buffer.reserve(1);
+                asset_load_buffer.write("\0", 1);
+                inlineParseConfig(font_settings, (char*)asset_load_buffer.data());
 
     			String pages_str = font_settings.get<String>("default.pages");
     			DynamicArray<String> page_names = splitStringToArray(pages_str, ';');
     			for(const String& page_name : page_names)
     			{
-        			loadDataToBuffer("fonts", name, page_name.c_string(), "png", true);
     				FontData::rasterized_page& page = pages.pushCtor();
 
     				String page_kv;
-					#define get_page_ivec2(VAR) \
-					page_kv.clear();\
-					page_kv << page_name << "." << #VAR;\
-					page_kv = font_settings.get<String>(page_kv);\
-					page.VAR = danikk_framework::ivec2_from_string(page_kv);
 
-					get_page_ivec2(start_offset);
-					get_page_ivec2(char_code_range);
-					get_page_ivec2(char_size);
-					get_page_ivec2(char_offset);
+    				format(page_kv, "%.start_offset", page_name);
+    				page_kv = font_settings.get<String>(page_kv);
+					page.start_offset = danikk_framework::ivec2_from_string(page_kv, ' ');
 
-					page_kv.clear();
-					page_kv << page_name << String(".margin");
+    				format(page_kv, "%.char_code_range", page_name);
+    				page_kv = font_settings.get<String>(page_kv);
+					page.char_code_range = danikk_framework::ivec2_from_string(page_kv, ' ');
+
+    				format(page_kv, "%.char_size", page_name);
+    				page_kv = font_settings.get<String>(page_kv);
+					page.char_size = danikk_framework::ivec2_from_string(page_kv, ' ');
+
+    				format(page_kv, "%.char_offset", page_name);
+    				page_kv = font_settings.get<String>(page_kv);
+					page.char_offset = danikk_framework::ivec2_from_string(page_kv, ' ');
+
+    				format(page_kv, "%.margin", page_name);
 					page_kv = font_settings.get<String>(page_kv);
 					if(page_kv.contains('%'))
 					{
@@ -122,12 +128,9 @@ namespace danikk_engine
 					}
 					else
 					{
-						page.margin = danikk_framework::ivec2_from_string(page_kv);
+						page.margin = danikk_framework::ivec2_from_string(page_kv, ' ');
 					}
-					#undef get_page_ivec2
-					page_kv.clear();
-					page_kv << page_name << ".row_char_count";
-					page_kv.c_string();
+    				format(page_kv, "%.row_char_count", page_name);
 					page.row_char_count = font_settings.get<int>(page_kv);
 
     	            int channels = 0;
@@ -135,15 +138,11 @@ namespace danikk_engine
     	            int height = 0;
     	            char* atlas_ptr = NULL;
 
+        			loadDataToBuffer("fonts", name, page_name.c_string(), "png", true);
     	            atlas_ptr = (char*)stb::load_from_memory((uint8*)asset_load_buffer.data(),
                     	asset_load_buffer.size(), &width, &height, &channels, 0);
     	            assert(channels == 1);
     	            page.atlas = FixedRefMatrix<uint8>((uint8*)atlas_ptr, width, height);
-
-
-					page_kv.clear();
-					page_kv << page_name << ".row_char_count";
-    	            page.row_char_count = font_settings.get<int>(page_kv);
 
                     assert(page.atlas.size() != uvec2(0, 0));
     			}

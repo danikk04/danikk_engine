@@ -39,8 +39,6 @@ namespace danikk_engine
 		#define MID_Y MID(y)
 		#define TOP_Y ALTER(y)
 
-		assert(anchor != GUIAnchor::none);
-
 		switch(anchor)
 		{
 			#define CASE(name, x, y) case GUIAnchor::name: return vec2(x, y);
@@ -53,6 +51,7 @@ namespace danikk_engine
 			CASE(left,		LEFT_X	, MID_Y)
 			CASE(top_left, 	LEFT_X	, TOP_Y)
 			CASE(center, 	MID_X	, MID_Y)
+			case GUIAnchor::none: return vec2(0,0);
 			default: return vec2(0,0);
 			#undef CASE
 		}
