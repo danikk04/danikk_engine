@@ -56,6 +56,21 @@ namespace danikk_engine
 		{
 			dynamic_cube.addSquare(vec3(0, 0, z), vec3(0, 0, z * 2));
 		}
+		/*
+		for (int i = 0; i < 3; ++i)
+		{
+			for (float v = start; v < end; v += step)
+			{
+				vec3 pos(0.0f);
+				vec3 dir(0.0f);
+
+				pos[i] = v;
+				dir[i] = v * 2.0f;
+
+				dynamic_cube.addSquare(pos, dir);
+			}
+		}
+		*/
 
 		dynamic_cube.setDataToMesh(cube_mesh);
 		DefaultVertex::setAttributes();
