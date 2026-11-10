@@ -6,7 +6,6 @@
 
 namespace danikk_engine
 {
-	Mesh cube_mesh;
 
 	uvec2 square_tex_coords[4]
 	{
@@ -40,39 +39,6 @@ namespace danikk_engine
 				2, 1, 0,
 			}
 		);
-		DynamicMesh<DefaultVertex> dynamic_cube;
-		float start = -0.50f;
-		float end = 1.0f;
-		float step = 1.0f;
-		for(float x = start; x <end; x += step)
-		{
-			dynamic_cube.addSquare(vec3(x, 0, 0), vec3(x * 2, 0, 0));
-		}
-		for(float y = start; y < end; y += step)
-		{
-			dynamic_cube.addSquare(vec3(0, y, 0), vec3(0, y * 2, 0));
-		}
-		for(float z = start; z < end; z += step)
-		{
-			dynamic_cube.addSquare(vec3(0, 0, z), vec3(0, 0, z * 2));
-		}
-		/*
-		for (int i = 0; i < 3; ++i)
-		{
-			for (float v = start; v < end; v += step)
-			{
-				vec3 pos(0.0f);
-				vec3 dir(0.0f);
-
-				pos[i] = v;
-				dir[i] = v * 2.0f;
-
-				dynamic_cube.addSquare(pos, dir);
-			}
-		}
-		*/
-
-		dynamic_cube.setDataToMesh(cube_mesh);
 		DefaultVertex::setAttributes();
 		dynamic_sprite_mesh.setDataToMesh(sprite_mesh);
 		DefaultVertex::setAttributes();
