@@ -207,17 +207,26 @@ namespace danikk_engine
 		switch(style.anchor)
 		{
 			case TextAnchor::none: logWarning("style.anchor == TextAnchor::none");
-			case TextAnchor::multiline: draw_start = pos; break;
+			case TextAnchor::multiline:
+				draw_start = pos + vec2(0.0f, size.y - char_size.y);
+				break;
 			case TextAnchor::center:
 				vec2 text_size = char_size;
 				text_size.x *= chars.size();
 				draw_start = pos + (size - text_size) / vec2(2.0f);
 			break;
 		}
-		uint32 char_counter = 0;
+		uint32 line_char_counter = 0;
+		uint32 line_counter = 0;
 		for(uint32* cur = chars.begin(); cur < chars.end(); cur++)
 		{
 			uint32 chr = *cur;
+			if(chr == '\n' && style.anchor == TextAnchor::multiline)
+			{
+				line_char_counter = 0;
+				line_counter++;
+				continue;
+			}
 			uint32 atlas_index = chr / FontData::char_atlas_count;						//Индекс атласа
 			uint32 char_atlas_index = chr % FontData::char_atlas_count;					//Индекс символа в атласе
 			uint32 char_atlases_target_size = atlas_index + 1;							//Размер массива атласов, у которого последний элемент будет нужным нам атласом.
@@ -356,7 +365,9 @@ namespace danikk_engine
 			{
 				vec2 char_atlas_pos = vec2((float)(char_atlas_index % FontData::char_axis_count), (float)(char_atlas_index / FontData::char_axis_count));
 				char_atlas_pos /= (float)FontData::char_axis_count;
-				vec2 char_pos = vec2(draw_start.x + char_counter * (char_size.x + style.char_interval), draw_start.y);
+				vec2 char_pos = vec2(
+					draw_start.x + line_char_counter * (char_size.x + style.char_interval),
+					draw_start.y - line_counter * char_size.y);
 
 				uv_matrix pos_matrix;
 				uv_matrix uv_matrix;
@@ -377,7 +388,7 @@ namespace danikk_engine
 				drawSpriteMesh();
 			}
 
-			char_counter++;
+			line_char_counter++;
 		}
 	}
 }
