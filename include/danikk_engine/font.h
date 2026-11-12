@@ -7,24 +7,12 @@
 
 namespace danikk_engine
 {
-	namespace internal
-	{
-		void initFontRenderer();
-	}
-
-	enum FontTypes
-	{
-		none,
-		true_type,
-		rasterized
-	};
-
 	class Font : private internal::Asset
 	{
 	public:
 		Font() = default;
 
-		void load(const char* name, int font_type = FontTypes::true_type);
+		void load(const char* name);
 
 		Font(Font& other);
 

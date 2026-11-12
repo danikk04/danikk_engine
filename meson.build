@@ -37,7 +37,6 @@ deps = [
     dependency('glfw3'),
     dependency('libzip'),
     dependency('assimp'),
-    dependency('freetype2'),
     dependency('threads'),
     #dependency('dl'),
     this_dep

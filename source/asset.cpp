@@ -5,11 +5,9 @@
 #include <danikk_engine/shader.h>
 #include <danikk_engine/texture.h>
 #include <danikk_engine/font.h>
-#include <danikk_engine/localization.h>
 
 #include <danikk_engine/internal/gl_object_manager.h>
 #include <danikk_engine/internal/asset.h>
-#include <danikk_engine/internal/font.h>
 #include <danikk_engine/texture_methods.h>
 #include <danikk_engine/internal/glexec.h>
 
@@ -85,10 +83,7 @@ namespace danikk_engine
 
 		static void freeFont(AssetContainer& container)
 		{
-			if(container.font_ptr->font_type == FontTypes::true_type)
-			{
-				FT_Done_Face(container.font_ptr->true_type_data.face);
-			}
+			(void)container;
 		}
 
 		static void freeModel(AssetContainer& container)

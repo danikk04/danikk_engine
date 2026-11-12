@@ -45,13 +45,6 @@ namespace danikk_engine
 		_("Texture::Texture/load", 				"load texture", 					"загрузить")
 		_("Texture::Texture/color_channels",	"unexpected texture channels count","неправильное количество каналов текстуры")
 
-		_("initFontRenderer::init_freetype2",	"initialize freetype2",				"инициализировать freetype2")
-		_("Font::draw/load_glyph",				"load glyph",						"загрузить глиф")
-		_("Font::draw/render_glyph",			"render glyph",						"нарисовать глиф")
-		_("Font::draw/glyph_size",				"glyph size",						"размер глифа")
-		_("Font::Font/set_size", 				"set char size", 					"установить размер символа")
 		_("Font::Font/load", 					"load font", 						"загрузить шрифт")
-		_("Font::Font/init_face", 				"initialize font face", 			"инициализировать шрифт")
-		_("Font::Font/select_charmap", 			"select charmap", 					"выбрать карту символов")
 	}
 }

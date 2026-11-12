@@ -418,7 +418,6 @@ DECLARE_MAIN
 	initAssetTypes();
 	initDataManager();
 	initShaderCompiler();
-	initFontRenderer();
 	initGraphics();
 	begin();
 	mainLoop();

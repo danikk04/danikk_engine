@@ -4,9 +4,6 @@
 #include <danikk_framework/matrix.h>
 #include <danikk_framework/glm.h>
 
-#include <freetype2/ft2build.h>
-#include <freetype/freetype.h>
-
 namespace danikk_engine
 {
 	namespace internal
@@ -46,20 +43,7 @@ namespace danikk_engine
 				int row_char_count;
 			};
 
-			int font_type;
-
-			struct rasterized_data_t
-			{
-				DynamicArray<rasterized_page> pages;
-			};
-
-			struct true_type_data_t
-			{
-				FT_Face face = NULL;
-			};
-
-			rasterized_data_t rasterized_data;
-			true_type_data_t true_type_data;
+			DynamicArray<rasterized_page> rasterized_pages;
 
 			DynamicArray<FontData::CharAtlas> char_atlases;
 
