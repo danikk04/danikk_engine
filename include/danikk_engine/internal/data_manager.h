@@ -6,7 +6,7 @@
 #include <danikk_framework/memory_buffer.h>
 #include <danikk_framework/path_buffer.h>
 
-#include <danikk_framework/cataloged_dictionary.h>
+#include <danikk_framework/dictionary.h>
 
 namespace danikk_engine
 {
@@ -22,6 +22,6 @@ namespace danikk_engine
 
 	    extern MemoryBuffer asset_load_buffer;
 	    extern String localpath_buffer;
-	    extern danikk_framework::CatalogedDictionary<AssetContainer*, danikk_framework::pathSlash> assets;
+	    extern danikk_framework::DynamicDictionary<danikk_framework::String, AssetContainer*> assets;
 	}
 }

@@ -41,7 +41,7 @@ namespace danikk_engine
 	{
 		MemoryBuffer asset_load_buffer;
 		String localpath_buffer;
-		danikk_framework::CatalogedDictionary<AssetContainer*, pathSlash> assets;
+		danikk_framework::DynamicDictionary<String, AssetContainer*> assets;
 
 		void initDataManager()
 		{

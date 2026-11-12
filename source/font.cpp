@@ -13,7 +13,7 @@
 #include <danikk_engine/matrix/pos.h>
 #include <danikk_engine/matrix/uv.h>
 #include <danikk_framework/matrix.h>
-#include <danikk_framework/cataloged_dictionary.h>
+#include <danikk_framework/dictionary.h>
 #include <danikk_framework/config.h>
 #include <danikk_framework/string_features.h>
 #include <danikk_framework/format.h>
