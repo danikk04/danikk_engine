@@ -4,11 +4,13 @@
 #include <danikk_engine/internal/glexec.h>
 #include <danikk_engine/internal/gl_object_manager.h>
 
-#include <danikk_framework/misc/line_getter.h>
-#include <danikk_framework/cstring_functions.h>
 #include <danikk_framework/glm.h>
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <glad/glad.h>
+#include <limits>
 
 namespace danikk_engine
 {
@@ -23,8 +25,25 @@ namespace danikk_engine
 		indexes_count = 0;
 	}
 
-	Mesh::Mesh(const char* model_name, const char* name)
+	Mesh::Mesh(const char* model_name, const char* name) : Mesh()
 	{
+		loadObj(model_name, name);
+	}
+
+	/*
+	 * Loads one OBJ file into a single GPU mesh. The parser collects all vertex
+	 * positions, UVs, and normals using Assimp, triangulates faces, and appends
+	 * every imported scene mesh to shared vertex and index buffers. Object, group,
+	 * and material boundaries are ignored. Missing UVs become zero coordinates.
+	 */
+	bool Mesh::loadObj(const char* model_name, const char* name)
+	{
+		free();
+		element_buffer_object = 0;
+		vertex_buffer_object = 0;
+		vertex_array_object = 0;
+		indexes_count = 0;
+
 		bool can_load;
 		if(model_name == NULL)
 		{
@@ -34,69 +53,89 @@ namespace danikk_engine
 		{
 			can_load = loadDataToBuffer("models", model_name, name, "obj", true);
 		}
-		generateBuffers();
-		DynamicArray<vec3> vertex_pos;
-		DynamicArray<vec2> vertex_uv;
-		DynamicArray<vec3> vertex_normal;
+		if(!can_load) return false;
+
 		DynamicArray<DefaultVertex> vertexes;
 		DynamicArray<gl_point_index_t> indexes;
-
-		if(can_load)
+		Assimp::Importer importer;
+		const aiScene* scene = importer.ReadFileFromMemory(
+			asset_load_buffer.data(),
+			asset_load_buffer.size(),
+			aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_PreTransformVertices,
+			"obj");
+		if(scene == nullptr || scene->mNumMeshes == 0)
 		{
-			char* current_obj_ptr = asset_load_buffer.c_string();
-			Array<char*, 16> splitted;
-			Array<char, 8> splitters
-			{
-				' ',
-				'/'
-			};
-			while (*current_obj_ptr != '\0')
-			{
-				char* line = getLine(current_obj_ptr);
-				splitted.clear();
-				strsplit(line, splitted, splitters);
-				//SplitToFirstSelectedChar(OBJReader.ReadLine(), ' ', out string DataType, out string Value);
-				char* obj_key = splitted[0];
-				//Забыл зачем strreplacefirst8, проверить. Код перенесён из старого движка на C#
-				if(strequal(obj_key, "v"))
-				{
-					//strreplacefirst8(splitted[1], '.', ',');
-					//strreplacefirst8(splitted[2], '.', ',');
-					//strreplacefirst8(splitted[3], '.', ',');
-					vertex_pos.push(parseVec3(splitted.data() + 1));
-				}
-				else if(strequal(obj_key, "vt"))
-				{
-					//strreplacefirst8(splitted[1], '.', ',');
-					//strreplacefirst8(splitted[2], '.', ',');
-					vertex_uv.push(parseVec2(splitted.data() + 1));
-				}
-				else if(strequal(obj_key, "vn"))
-				{
-					//strreplacefirst8(splitted[1], '.', ',');
-					//strreplacefirst8(splitted[2], '.', ',');
-					//strreplacefirst8(splitted[3], '.', ',');
-					vertex_normal.push(parseVec3(splitted.data() + 1));
-				}
-				else if(strequal(obj_key, "f"))
-				{
-					char** current_data = splitted.data() + 1;
-					index_t base_index = vertexes.size();
-					for(index_t i = 0; i < 3; i++)
-					{
-						uvec3 index_vec = parseUvec3(current_data + i * 3);
-						vertexes.pushCtor(
-								vertex_pos[index_vec[0] - 1],
-								vertex_normal[index_vec[1] - 1],
-								vertex_uv[index_vec[2] - 1]);
-						indexes.push(base_index + i);
+			formatLogWarning("Failed to import OBJ mesh: %", importer.GetErrorString());
+			return false;
+		}
 
-					}
+		size_t triangle_count = 0;
+		for(uint32 mesh_index = 0; mesh_index < scene->mNumMeshes; mesh_index++)
+		{
+			const aiMesh& imported_mesh = *scene->mMeshes[mesh_index];
+			for(uint32 face_index = 0; face_index < imported_mesh.mNumFaces; face_index++)
+			{
+				if(imported_mesh.mFaces[face_index].mNumIndices == 3)
+				{
+					triangle_count++;
 				}
 			}
-			setData((float*)vertexes.data(), vertexes.size() * sizeof(DefaultVertex) / sizeof(float), indexes.data(), indexes.size());
-			DefaultVertex::setAttributes();
 		}
+		const size_t expanded_vertex_count = triangle_count * 3;
+		if(expanded_vertex_count > static_cast<size_t>(std::numeric_limits<gl_point_index_t>::max()) + 1)
+		{
+			formatLogWarning("OBJ mesh exceeds the 16-bit index limit");
+			return false;
+		}
+		vertexes.reserve(expanded_vertex_count);
+		indexes.reserve(expanded_vertex_count);
+
+		for(uint32 mesh_index = 0; mesh_index < scene->mNumMeshes; mesh_index++)
+		{
+			const aiMesh& imported_mesh = *scene->mMeshes[mesh_index];
+			for(uint32 face_index = 0; face_index < imported_mesh.mNumFaces; face_index++)
+			{
+				const aiFace& face = imported_mesh.mFaces[face_index];
+				if(face.mNumIndices != 3) continue;
+
+				vec3 face_positions[3];
+				for(uint8 vertex_index = 0; vertex_index < 3; vertex_index++)
+				{
+					const aiVector3D& position = imported_mesh.mVertices[face.mIndices[vertex_index]];
+					face_positions[vertex_index] = vec3(position.x, position.y, position.z);
+				}
+				const vec3 face_normal = glm::normalize(glm::cross(
+					face_positions[1] - face_positions[0],
+					face_positions[2] - face_positions[0]));
+
+				for(uint8 vertex_index = 0; vertex_index < 3; vertex_index++)
+				{
+					const uint32 imported_index = face.mIndices[vertex_index];
+					vec3 normal = face_normal;
+					if(imported_mesh.HasNormals())
+					{
+						const aiVector3D& imported_normal = imported_mesh.mNormals[imported_index];
+						normal = vec3(imported_normal.x, imported_normal.y, imported_normal.z);
+					}
+					vec2 uv(0.0f);
+					if(imported_mesh.HasTextureCoords(0))
+					{
+						const aiVector3D& imported_uv = imported_mesh.mTextureCoords[0][imported_index];
+						uv = vec2(imported_uv.x, imported_uv.y);
+					}
+					vertexes.pushCtor(face_positions[vertex_index], normal, uv);
+					indexes.push(static_cast<gl_point_index_t>(indexes.size()));
+				}
+			}
+		}
+		if(vertexes.size() == 0)
+		{
+			formatLogWarning("OBJ mesh contains no triangles");
+			return false;
+		}
+		setData((float*)vertexes.data(), vertexes.size() * sizeof(DefaultVertex) / sizeof(float), indexes.data(), indexes.size());
+		DefaultVertex::setAttributes();
+		return true;
 	}
 
 	void Mesh::generateBuffers()
@@ -119,18 +158,18 @@ namespace danikk_engine
 		glBindVertexArray(vertex_array_object);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_count * sizeof(uint), indexes, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_count * sizeof(gl_point_index_t), indexes, GL_STATIC_DRAW);
 	}
 
 	void Mesh::free()
 	{
-		if(isNull())
-		{
-			return;
-		}
-		glDeleteBuffer(element_buffer_object);
-		glDeleteBuffer(vertex_buffer_object);
-		glDeleteVertexArray(vertex_array_object);
+		if(element_buffer_object) glDeleteBuffer(element_buffer_object);
+		if(vertex_buffer_object) glDeleteBuffer(vertex_buffer_object);
+		if(vertex_array_object) glDeleteVertexArray(vertex_array_object);
+		element_buffer_object = 0;
+		vertex_buffer_object = 0;
+		vertex_array_object = 0;
+		indexes_count = 0;
 	}
 
 	bool Mesh::isNull()

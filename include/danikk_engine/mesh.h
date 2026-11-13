@@ -67,6 +67,8 @@ namespace danikk_engine
 
 		Mesh(const char* model_name, const char* name);//загрузка из obj файла
 
+		bool loadObj(const char* model_name, const char* name);
+
 		void free();
 
 		bool isNull();
