@@ -173,7 +173,7 @@ namespace danikk_engine
     	(void)severity;
     	(void)length;
     	(void)userParam;
-    	log("GL    ", message);
+    	log("GL", message);
     }
 
     static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -210,7 +210,8 @@ namespace danikk_engine
 
     static void initGraphics()
     {
-    	assert(glfwInit());
+	checkRSSBegin("Init GLFW and create window");
+	assert(glfwInit());
 
         glfwSetErrorCallback(errorCallback);
 
@@ -253,10 +254,14 @@ namespace danikk_engine
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	checkRSSEnd();
+	checkRSSBegin("Init GLAD and load OpenGL");
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
         	fatalError("Cant inir glad");
         }
+	checkRSSEnd();
+	checkRSSBegin("Minor engine graphics init");
 
 		#define display_gl_thing(name) formatLogInfo("% : %", #name , (char*)glGetString(name));
 			display_gl_thing(GL_VENDOR)
@@ -285,6 +290,7 @@ namespace danikk_engine
 
 		glfwSetWindowSize(window, window_size.x+1, window_size.y);
         glViewport(0, 0, window_size.x, window_size.y);
+	checkRSSEnd();
     }
 
     void exit()
