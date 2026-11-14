@@ -4,6 +4,7 @@
 #include <thread>
 #include <mutex>
 #include <functional>
+#include <atomic>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -29,6 +30,7 @@
 #include <danikk_engine/localization.h>
 #include <danikk_engine/internal/data_manager.h>
 #include <danikk_engine/internal/gl_object_manager.h>
+#include <danikk_engine/internal/glexec.h>
 #include <danikk_engine/internal/error.h>
 #include <danikk_engine/font.h>
 #include <danikk_engine/sprite.h>
@@ -49,6 +51,7 @@ namespace danikk_engine_game
 	void begin();
 	void frame();
 	void pre_begin();
+	void end();
 }
 
 namespace danikk_engine
@@ -74,6 +77,7 @@ namespace danikk_engine
     bool gl_thing_execute_requied = false;
     mutex gl_operation_mutex;
     std::function<void()> gl_thing;
+    std::atomic<bool> gl_context_active = true;
 
     ivec2 window_size = uvec2(1440, 900);
 
@@ -347,6 +351,7 @@ namespace danikk_engine
 	{
 		void _glexec(std::function<void()> func)
 		{
+			if(!gl_context_active.load()) return;
 			if(is_main_thread)
 			{
 				func();
@@ -359,6 +364,11 @@ namespace danikk_engine
 				gl_operation_mutex.lock();
 				gl_operation_mutex.unlock();
 			}
+		}
+
+		void setGlContextActive(bool active)
+		{
+			gl_context_active.store(active);
 		}
 	}
 
@@ -427,7 +437,10 @@ DECLARE_MAIN
 	initGraphics();
 	begin();
 	mainLoop();
-    glfwDestroyWindow(window);
-    //glfwTerminate();
+	glfwMakeContextCurrent(window);
+	danikk_engine_game::end();
+	danikk_engine::internal::setGlContextActive(false);
+	glfwDestroyWindow(window);
+    glfwTerminate();
     return 0;
 }

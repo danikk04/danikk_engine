@@ -6,6 +6,7 @@ namespace danikk_engine
 	namespace internal
 	{
 		 void _glexec(std::function<void()> func);
+		 void setGlContextActive(bool active);
 	}
 
 	//glexec используется только для исполнения opengl кода для загрузки графических ассетов.

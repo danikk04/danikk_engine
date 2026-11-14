@@ -189,10 +189,19 @@ namespace danikk_engine
 
 	void Mesh::draw()
 	{
+		drawRange(0, indexes_count);
+	}
+
+	void Mesh::drawRange(uint32 first_index, uint32 index_count)
+	{
 		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
 		glBindVertexArray(vertex_array_object);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
-		glDrawElements(GL_TRIANGLES, indexes_count, GL_UNSIGNED_INT, (void*)(0));
+		glDrawElements(
+			GL_TRIANGLES,
+			static_cast<GLsizei>(index_count),
+			GL_UNSIGNED_INT,
+			reinterpret_cast<void*>(static_cast<size_t>(first_index) * sizeof(gl_point_index_t)));
 	}
 
 	void vertexAttribFloatPointer(uint index, int size, int offset, int vertex_size)

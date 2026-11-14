@@ -85,5 +85,6 @@ namespace danikk_engine
 		void unbind();*/
 
 		void draw();
+		void drawRange(uint32 first_index, uint32 index_count);
 	};
 }
