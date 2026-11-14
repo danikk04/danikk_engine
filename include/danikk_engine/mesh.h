@@ -9,7 +9,7 @@ namespace danikk_engine
 		Texture diffuse_texture;
 	};
 
-	typedef uint16 gl_point_index_t;
+	typedef uint32 gl_point_index_t;
 
 	void vertexAttribFloatPointer(uint index, int size, int offset, int vertex_size);
 
