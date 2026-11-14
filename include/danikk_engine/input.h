@@ -147,6 +147,7 @@ namespace danikk_engine
 	int getKeyboardState(int button);
 
 	int getMouseState(int button);
+	float getMouseScrollDelta();
 
 	float getMouseSensivity();
 

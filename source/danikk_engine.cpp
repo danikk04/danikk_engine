@@ -118,6 +118,7 @@ namespace danikk_engine
 
 	button_state mouse_button_states[8]{ button_states::free };
 	button_state keyboard_button_states[400]{ button_states::free };
+    float mouse_scroll_delta = 0.0f;
 
 	float getMouseSensivity()
 	{
@@ -132,6 +133,11 @@ namespace danikk_engine
 	int getMouseState(int button)
 	{
     	return mouse_button_states[button].getState();
+	}
+
+	float getMouseScrollDelta()
+	{
+		return mouse_scroll_delta;
 	}
 
     static void cursorPositionCallback(GLFWwindow* window, double x, double y)
@@ -162,6 +168,13 @@ namespace danikk_engine
     		}
     	}
     }
+
+	static void scrollCallback(GLFWwindow* window, double x_offset, double y_offset)
+	{
+		(void)window;
+		(void)x_offset;
+		mouse_scroll_delta += static_cast<float>(y_offset);
+	}
 
     static void errorCallback(int error, const char* description)
     {
@@ -253,6 +266,7 @@ namespace danikk_engine
         glfwSetCharCallback(window, charCallback);
         glfwSetCursorPosCallback(window, cursorPositionCallback);
         glfwSetMouseButtonCallback(window, mouseButtonCallback);
+		glfwSetScrollCallback(window, scrollCallback);
         if(off_cursor)
         {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -397,6 +411,7 @@ namespace danikk_engine
     {
         while (!glfwWindowShouldClose(window))
         {
+			mouse_scroll_delta = 0.0f;
             glfwPollEvents();
         	glUniform1f(shader_layout_locations::time_factor, game_time);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
