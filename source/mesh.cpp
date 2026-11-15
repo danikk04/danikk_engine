@@ -25,6 +25,35 @@ namespace danikk_engine
 		indexes_count = 0;
 	}
 
+	Mesh::Mesh(Mesh&& other) noexcept
+		: element_buffer_object(other.element_buffer_object),
+		  vertex_buffer_object(other.vertex_buffer_object),
+		  vertex_array_object(other.vertex_array_object),
+		  indexes_count(other.indexes_count)
+	{
+		other.element_buffer_object = 0;
+		other.vertex_buffer_object = 0;
+		other.vertex_array_object = 0;
+		other.indexes_count = 0;
+	}
+
+	Mesh& Mesh::operator=(Mesh&& other) noexcept
+	{
+		if(this == &other) return *this;
+
+		free();
+		element_buffer_object = other.element_buffer_object;
+		vertex_buffer_object = other.vertex_buffer_object;
+		vertex_array_object = other.vertex_array_object;
+		indexes_count = other.indexes_count;
+
+		other.element_buffer_object = 0;
+		other.vertex_buffer_object = 0;
+		other.vertex_array_object = 0;
+		other.indexes_count = 0;
+		return *this;
+	}
+
 	Mesh::Mesh(const char* model_name, const char* name) : Mesh()
 	{
 		loadObj(model_name, name);

@@ -27,6 +27,8 @@ namespace danikk_engine
 
     void setDrawColor(const vec4& color);
 
+    void setDepthWriteEnabled(bool enabled);
+
     void bindTexture(uint handle, uint index);
 
 	void drawSpriteMesh();

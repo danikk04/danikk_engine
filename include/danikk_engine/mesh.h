@@ -61,9 +61,9 @@ namespace danikk_engine
 
 		Mesh();
 
-		Mesh(Mesh&) = delete;
+		Mesh(const Mesh&) = delete;
 
-		Mesh(Mesh&&) = delete;
+		Mesh(Mesh&& other) noexcept;
 
 		Mesh(const char* model_name, const char* name);//загрузка из obj файла
 
@@ -73,9 +73,9 @@ namespace danikk_engine
 
 		bool isNull();
 
-		Mesh& operator=(Mesh&) = delete;
+		Mesh& operator=(const Mesh&) = delete;
 
-		Mesh& operator=(Mesh&&) = default;
+		Mesh& operator=(Mesh&& other) noexcept;
 
 		void generateBuffers();
 

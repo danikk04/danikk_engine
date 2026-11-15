@@ -84,6 +84,11 @@ namespace danikk_engine
 		glUniform4fv(shader_layout_locations::color, 1, (float*)&color);
     }
 
+    void setDepthWriteEnabled(bool enabled)
+    {
+		glDepthMask(enabled ? GL_TRUE : GL_FALSE);
+    }
+
     void bindTexture(uint handle, uint index)
     {
     	if(handle == 0)
