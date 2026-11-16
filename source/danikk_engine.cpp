@@ -420,10 +420,12 @@ namespace danikk_engine
             cursor_delta = cursor_pos - last_cursor_pos;
             last_cursor_pos = cursor_pos;
 
+			glDisable(GL_DEPTH_TEST);
     		for(GUIElement* ch : gui_root.childs)
     		{
     			ch->recursiveDraw();
     		}
+			glEnable(GL_DEPTH_TEST);
             glfwSwapBuffers(window);
             fps_counter.check();
             glUniform1f(shader_layout_locations::time_factor, sin(game_time));
