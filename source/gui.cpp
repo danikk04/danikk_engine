@@ -50,6 +50,10 @@ namespace danikk_engine
 		{
 			border_draw_style->draw(offset, scale);
 		}
+		if(draw_callback != nullptr)
+		{
+			draw_callback(offset, scale);
+		}
 	}
 
 	void GUIElement::handleClick(int32 is_pushed)

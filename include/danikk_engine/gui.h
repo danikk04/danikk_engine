@@ -42,6 +42,8 @@ namespace danikk_engine
 		String text;
 		TextStyle* text_style = &default_text_style;
 		std::function<void()> on_click;
+		/** @brief Optional custom drawing callback invoked after this element's background and border. */
+		std::function<void(vec2, vec2)> draw_callback;
 
 		Sprite sprite;
 		DrawStyle* draw_style = NULL;
