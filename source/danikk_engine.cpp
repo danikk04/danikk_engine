@@ -80,6 +80,7 @@ namespace danikk_engine
     std::atomic<bool> gl_context_active = true;
 
     ivec2 window_size = uvec2(1440, 900);
+	ivec2 framebuffer_size = ivec2(1440, 900);
 
 	float screen_ratio_gz;
 	float screen_ratio_lz;
@@ -140,16 +141,60 @@ namespace danikk_engine
 		return mouse_scroll_delta;
 	}
 
+    /**
+     * @brief Recalculates normalized GUI rectangles after a window or framebuffer resize.
+     * @param element Root element whose descendants are updated before another input event.
+     */
+    static void recalculateGuiLayout(GUIElement& element)
+    {
+        if(element.parent != nullptr)
+        {
+            element.absolute_size = element.parent->absolute_size * element.relative_size
+                + getPixelSize() * element.pixel_size;
+            element.absolute_pos = element.parent->absolute_pos
+                + applyAnchor(element.pos, element.absolute_size, element.parent->absolute_size, element.anchor);
+        }
+        element.flags.set(GUIElementFlags::absolute_recalc, false);
+        for(GUIElement* child : element.childs)
+        {
+            recalculateGuiLayout(*child);
+        }
+    }
+
+    static void updateCursorPosition(GLFWwindow* window, double x, double y)
+    {
+        int32 width = 0;
+        int32 height = 0;
+        glfwGetWindowSize(window, &width, &height);
+        if(width <= 0 || height <= 0) return;
+        window_size = ivec2(width, height);
+        cursor_pos = vec2(static_cast<float>(x / width), 1.0f - static_cast<float>(y / height));
+    }
+
     static void cursorPositionCallback(GLFWwindow* window, double x, double y)
     {
-    	vec2 new_cursor_pos = vec2(
-			cursor_pos.x = x / window_size.x,
-			cursor_pos.y = 1 - y / window_size.y);//преобразование из системы координат ввода в систему координат OpenGL
-    	cursor_pos = new_cursor_pos;
+        updateCursorPosition(window, x, y);
+    }
+
+    static void windowSizeCallback(GLFWwindow* window, int width, int height)
+    {
+        if(width <= 0 || height <= 0) return;
+        window_size = ivec2(width, height);
+        double cursor_x = 0.0;
+        double cursor_y = 0.0;
+        glfwGetCursorPos(window, &cursor_x, &cursor_y);
+        updateCursorPosition(window, cursor_x, cursor_y);
+        last_cursor_pos = cursor_pos;
+        cursor_delta = vec2(0.0f);
+        recalculateGuiLayout(gui_root);
     }
 
     void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
+        double cursor_x = 0.0;
+        double cursor_y = 0.0;
+        glfwGetCursorPos(window, &cursor_x, &cursor_y);
+        updateCursorPosition(window, cursor_x, cursor_y);
     	button_state* currentMouseButton = &mouse_button_states[button];
 		currentMouseButton->change_frame = frame_count;
     	if(action == GLFW_RELEASE)
@@ -196,7 +241,12 @@ namespace danikk_engine
     static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
     {
         (void)window;
+        if(width <= 0 || height <= 0) return;
+        framebuffer_size = ivec2(width, height);
+        screen_ratio_gz = static_cast<float>(width) / static_cast<float>(height);
+        screen_ratio_lz = static_cast<float>(height) / static_cast<float>(width);
         glViewport(0, 0, width, height);
+        recalculateGuiLayout(gui_root);
     }
 
     static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -255,12 +305,14 @@ namespace danikk_engine
         //window_size = uvec2(mode->width, mode->height);
 
         glfwGetWindowSize(window, &window_size.x, &window_size.y);
+        glfwGetFramebufferSize(window, &framebuffer_size.x, &framebuffer_size.y);
 
-    	screen_ratio_gz = (float)window_size.x / (float)window_size.y;
-    	screen_ratio_lz = (float)window_size.y / (float)window_size.x;
+        screen_ratio_gz = static_cast<float>(framebuffer_size.x) / static_cast<float>(framebuffer_size.y);
+        screen_ratio_lz = static_cast<float>(framebuffer_size.y) / static_cast<float>(framebuffer_size.x);
 
         glfwMakeContextCurrent((GLFWwindow*)window);
         glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+        glfwSetWindowSizeCallback(window, windowSizeCallback);
         glfwSetKeyCallback(window, keyCallback);
         glfwSetWindowRefreshCallback(window, windowRefreshCallback);
         glfwSetCharCallback(window, charCallback);
@@ -307,7 +359,7 @@ namespace danikk_engine
 		gui_root.absolute_size = vec2(1.0f);
 
 		glfwSetWindowSize(window, window_size.x+1, window_size.y);
-        glViewport(0, 0, window_size.x, window_size.y);
+        glViewport(0, 0, framebuffer_size.x, framebuffer_size.y);
 	checkRSSEnd();
     }
 
@@ -348,7 +400,7 @@ namespace danikk_engine
 
     vec2 getPixelSize()
     {
-    	return vec2(1.0f / window_size.x, 1.0f / window_size.y);
+        return vec2(1.0f / framebuffer_size.x, 1.0f / framebuffer_size.y);
     }
 
     vec2 getCursorPos()
