@@ -17,6 +17,9 @@ namespace danikk_engine
 
     float gameTime();
 
+    /** @brief Returns monotonic elapsed time in milliseconds as a wrapping uint32 timestamp. */
+    uint32 getMsTimestamp();
+
     float getTimeFactor();
 
     float getTargetFPS();

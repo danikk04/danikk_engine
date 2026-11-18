@@ -70,6 +70,8 @@ namespace danikk_engine
 
     TimeCounter fps_counter;
     static float game_time = 0;
+    static double ms_timestamp_seconds = 0.0;
+    static uint32 ms_timestamp = 1;
     static uint32 frame_count = 0;
     static bool off_cursor = false;
 
@@ -378,6 +380,11 @@ namespace danikk_engine
     	return game_time;
     }
 
+    uint32 getMsTimestamp()
+    {
+        return ms_timestamp;
+    }
+
     float getTimeFactor()
     {
     	return glm::cos(game_time * 2.0f * pi);
@@ -488,6 +495,8 @@ namespace danikk_engine
     			gl_operation_mutex.unlock();
             }
             game_time += target_fd;
+            ms_timestamp_seconds += static_cast<double>(getTargetFrameDelay());
+            ms_timestamp = static_cast<uint32>(static_cast<uint64>(ms_timestamp_seconds * 1000.0));
             frame_count++;
         }
     }
