@@ -151,6 +151,9 @@ namespace danikk_engine
 
 	float getMouseSensivity();
 
+	/** @brief Captures the cursor inside the game window, or releases it for GUI interaction. */
+	void setCursorCaptured(bool captured);
+
 	glm::vec2 getCursorPos();
 
 	glm::vec2 getCursorDelta();

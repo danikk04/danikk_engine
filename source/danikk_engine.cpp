@@ -73,7 +73,7 @@ namespace danikk_engine
     static double ms_timestamp_seconds = 0.0;
     static uint32 ms_timestamp = 1;
     static uint32 frame_count = 0;
-    static bool off_cursor = false;
+    static bool cursor_captured = true;
 
     thread_local bool is_main_thread = false;
     bool gl_thing_execute_requied = false;
@@ -289,11 +289,12 @@ namespace danikk_engine
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
         glfwWindowHint(GLFW_DECORATED, true);
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
-        window_size = ivec2(mode->width / 2 - 1, mode->height / 2);
+        window_size = ivec2(mode->width, mode->height);
 
         window = glfwCreateWindow(window_size.x, window_size.y, "danikk engine game", NULL, NULL);
 
@@ -321,7 +322,7 @@ namespace danikk_engine
         glfwSetCursorPosCallback(window, cursorPositionCallback);
         glfwSetMouseButtonCallback(window, mouseButtonCallback);
 		glfwSetScrollCallback(window, scrollCallback);
-        if(off_cursor)
+        if(cursor_captured)
         {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
@@ -418,6 +419,25 @@ namespace danikk_engine
     vec2 getCursorDelta()
     {
     	return cursor_delta;
+    }
+
+    void setCursorCaptured(bool captured)
+    {
+        if(cursor_captured == captured) return;
+        cursor_captured = captured;
+
+        if(window)
+        {
+            glfwSetInputMode(window, GLFW_CURSOR,
+                captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+
+            double cursor_x = 0.0;
+            double cursor_y = 0.0;
+            glfwGetCursorPos(window, &cursor_x, &cursor_y);
+            updateCursorPosition(window, cursor_x, cursor_y);
+            last_cursor_pos = cursor_pos;
+            cursor_delta = vec2(0.0f);
+        }
     }
 
     namespace internal
