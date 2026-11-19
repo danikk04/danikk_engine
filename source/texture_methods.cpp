@@ -95,6 +95,11 @@ namespace danikk_engine
 		else glDisable(GL_CULL_FACE);
     }
 
+    void setAlphaDiscardEnabled(bool enabled)
+    {
+		glUniform1i(shader_layout_locations::alpha_discard_enabled, enabled ? 1 : 0);
+    }
+
     void bindTexture(uint handle, uint index)
     {
     	if(handle == 0)

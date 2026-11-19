@@ -17,6 +17,7 @@ namespace danikk_engine
 		static constexpr uint uv = 6;
 		static constexpr uint color = 7;
 		static constexpr uint time_factor = 8;
+		static constexpr uint alpha_discard_enabled = 9;
 	}
 
 	namespace internal

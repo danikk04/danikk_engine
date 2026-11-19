@@ -31,6 +31,8 @@ namespace danikk_engine
 
     void setFaceCullingEnabled(bool enabled);
 
+    void setAlphaDiscardEnabled(bool enabled);
+
     void bindTexture(uint handle, uint index);
 
 	void drawSpriteMesh();
