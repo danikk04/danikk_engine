@@ -84,6 +84,11 @@ namespace danikk_engine
 		glUniform4fv(shader_layout_locations::color, 1, (float*)&color);
     }
 
+    void setClearColor(const vec3& color)
+    {
+		glClearColor(color.r, color.g, color.b, 1.0f);
+    }
+
     void setDepthWriteEnabled(bool enabled)
     {
 		glDepthMask(enabled ? GL_TRUE : GL_FALSE);

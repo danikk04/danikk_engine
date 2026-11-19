@@ -27,6 +27,9 @@ namespace danikk_engine
 
     void setDrawColor(const vec4& color);
 
+    /** @brief Sets the color used to clear the window before the next game frame. */
+    void setClearColor(const vec3& color);
+
     void setDepthWriteEnabled(bool enabled);
 
     void setFaceCullingEnabled(bool enabled);
