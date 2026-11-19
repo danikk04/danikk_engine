@@ -89,6 +89,12 @@ namespace danikk_engine
 		glDepthMask(enabled ? GL_TRUE : GL_FALSE);
     }
 
+    void setFaceCullingEnabled(bool enabled)
+    {
+		if(enabled) glEnable(GL_CULL_FACE);
+		else glDisable(GL_CULL_FACE);
+    }
+
     void bindTexture(uint handle, uint index)
     {
     	if(handle == 0)

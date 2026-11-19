@@ -29,6 +29,8 @@ namespace danikk_engine
 
     void setDepthWriteEnabled(bool enabled);
 
+    void setFaceCullingEnabled(bool enabled);
+
     void bindTexture(uint handle, uint index);
 
 	void drawSpriteMesh();
