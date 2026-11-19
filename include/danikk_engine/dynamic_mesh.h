@@ -16,6 +16,22 @@ namespace danikk_engine
 		DynamicArray<gl_point_index_t> indexes;
 	public:
 		DynamicMesh() = default;
+		DynamicMesh(const DynamicMesh&) = delete;
+		DynamicMesh& operator=(const DynamicMesh& other)
+		{
+			indexes = other.indexes;
+			vertexes = other.vertexes;
+			return *this;
+		}
+		DynamicMesh(DynamicMesh&& other) noexcept
+			: vertexes(static_cast<DynamicArray<vertex_t>&&>(other.vertexes)),
+			  indexes(static_cast<DynamicArray<gl_point_index_t>&&>(other.indexes)) {}
+		DynamicMesh& operator=(DynamicMesh&& other) noexcept
+		{
+			vertexes = static_cast<DynamicArray<vertex_t>&&>(other.vertexes);
+			indexes = static_cast<DynamicArray<gl_point_index_t>&&>(other.indexes);
+			return *this;
+		}
 
 		DynamicMesh(const InitList<vertex_t>& vertexes, const InitList<gl_point_index_t>& indexes)
 		{
@@ -28,11 +44,25 @@ namespace danikk_engine
 			target.setData((float*)vertexes.data(), vertexes.size() * sizeof(vertex_t) / sizeof(float), indexes.data(), indexes.size());
 		}
 
-		DynamicMesh& operator=(const DynamicMesh& other)
+		/** @brief Removes vertices and indices while retaining their allocated capacity. */
+		void clear()
 		{
-			indexes = other.indexes;
-			vertexes = other.vertexes;
-			return *this;
+			vertexes.clear();
+			indexes.clear();
+		}
+
+		/** @brief Reports whether this builder contains any triangles. */
+		bool empty() const { return indexes.size() == 0; }
+
+		/** @brief Appends one quad with caller-provided vertices and canonical triangle winding. */
+		void addQuad(const vertex_t* quad)
+		{
+			const gl_point_index_t first = static_cast<gl_point_index_t>(vertexes.size());
+			for(uint8 corner = 0; corner < 4; ++corner) vertexes.push(quad[corner]);
+			const gl_point_index_t quad_indices[] = {
+				first, first + 1, first + 2,
+				first, first + 2, first + 3};
+			for(gl_point_index_t index : quad_indices) indexes.push(index);
 		}
 
 		void addSquare(const vec3& pos, const vec3& normal, const vec2& uv_offset = vec2(0.0f), const vec2 uv_size = vec2(1.0f))
