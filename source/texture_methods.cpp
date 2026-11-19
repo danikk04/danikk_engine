@@ -94,6 +94,11 @@ namespace danikk_engine
 		glDepthMask(enabled ? GL_TRUE : GL_FALSE);
     }
 
+    void setDepthRange(float near_value, float far_value)
+    {
+		glDepthRange(near_value, far_value);
+    }
+
     void setFaceCullingEnabled(bool enabled)
     {
 		if(enabled) glEnable(GL_CULL_FACE);

@@ -32,6 +32,9 @@ namespace danikk_engine
 
     void setDepthWriteEnabled(bool enabled);
 
+    /** @brief Maps normalized depth values into a subsection of the depth buffer range. */
+    void setDepthRange(float near_value, float far_value);
+
     void setFaceCullingEnabled(bool enabled);
 
     void setAlphaDiscardEnabled(bool enabled);
