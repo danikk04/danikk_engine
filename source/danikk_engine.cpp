@@ -349,7 +349,6 @@ namespace danikk_engine
 		glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
-		glEnable(GL_CULL_FACE_MODE);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);

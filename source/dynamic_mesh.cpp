@@ -39,7 +39,6 @@ namespace danikk_engine
 				2, 1, 0,
 			}
 		);
-		DefaultVertex::setAttributes();
 		dynamic_sprite_mesh.setDataToMesh(sprite_mesh);
 		DefaultVertex::setAttributes();
 	}
