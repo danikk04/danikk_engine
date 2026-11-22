@@ -37,6 +37,11 @@ namespace danikk_engine
 
 	void GUIElement::draw(vec2 offset, vec2 scale)
 	{
+		if(text_writer != nullptr)
+		{
+			text.clear();
+			text_writer(text_source, text);
+		}
 		if(text.size() > 0 && text_style != NULL)
 		{
 			text_style->draw(text, offset, scale);

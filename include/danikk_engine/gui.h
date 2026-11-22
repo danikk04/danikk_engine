@@ -25,6 +25,15 @@ namespace danikk_engine
 	class GUIElement
 	{
 	public:
+		using TextWriter = void (*)(const void*, String&);
+
+	private:
+		/** @brief Optional source passed to the bound text writer; null is a valid source. */
+		const void* text_source = nullptr;
+		/** @brief Rebuilds the element text from its bound source before drawing. */
+		TextWriter text_writer = nullptr;
+
+	public:
 		DynamicArray<GUIElement*> childs;
 		GUIElement* parent = NULL;
 
@@ -54,6 +63,20 @@ namespace danikk_engine
 		GUIElement& operator=(const GUIElement&) = delete;
 
 		GUIElement& operator=(const GUIElement&&) = delete;
+
+		/** @brief Binds the element text to a source and its text-generation callback. */
+		void bind(const void* source, TextWriter writer)
+		{
+			text_source = source;
+			text_writer = writer;
+		}
+
+		/** @brief Removes the text binding, preserving the current text as static content. */
+		void unbind()
+		{
+			text_source = nullptr;
+			text_writer = nullptr;
+		}
 
 		void recursiveDraw();
 
