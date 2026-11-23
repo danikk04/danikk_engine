@@ -84,6 +84,11 @@ namespace danikk_engine
 		glUniform4fv(shader_layout_locations::color, 1, (float*)&color);
     }
 
+    void setFloatUniform(uint location, float value)
+    {
+		glUniform1f(location, value);
+    }
+
     void setClearColor(const vec3& color)
     {
 		glClearColor(color.r, color.g, color.b, 1.0f);

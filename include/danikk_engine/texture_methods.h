@@ -27,6 +27,9 @@ namespace danikk_engine
 
     void setDrawColor(const vec4& color);
 
+    /** @brief Sets a floating-point uniform on the currently active shader. */
+    void setFloatUniform(uint location, float value);
+
     /** @brief Sets the color used to clear the window before the next game frame. */
     void setClearColor(const vec3& color);
 
