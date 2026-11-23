@@ -14,6 +14,7 @@ include = [
     include_directories('include'),
     danikk_framework_proj.get_variable('include')
 ]
+gl_include = include_directories('include_lib')
 
 cpp_args = [
     '-Wvla'
@@ -22,7 +23,7 @@ cpp_args = [
 lib = static_library(
     'danikk_engine', 
     danikk_engine_source,
-    include_directories : include + include_directories('include_lib'),
+    include_directories : include + gl_include,
     link_args : ['-rdynamic'],
     cpp_args : cpp_args
 )
